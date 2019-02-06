@@ -52,7 +52,7 @@ Will we have to interpret quotes and retweets?
     "TWEET_HASH",
     "IDENTITY_RECORDING",
     "IDENTITY_KEY",
-    "SIGNATURE", // Marshaled data excluding the sig (pad with 64 null bytes)
+    "SIGNATURE // Marshaled data excluding the sig (pad with 64 null bytes)",
   ],
   "content": {
     "dateFetched": "DATE_API_CALL",
