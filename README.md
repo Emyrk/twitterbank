@@ -2,7 +2,7 @@
 
 # Factom structure
 
-```json
+```bash
 {
   "extids":[
     "TwitterBank Record", # Used to identify an entry for this project
