@@ -26,7 +26,7 @@ type DatabaseConfig struct {
 	Password string
 }
 
-func NewScraper(host string, port int, dbopts ...func(config *database.TwitterBankConfig)) (*Scraper, error) {
+func NewScaperWithDB(host string, port int, db *database.TwitterBankDatabase) (*Scraper, error) {
 	flog := scraperlog.WithField("func", "NewScraper")
 
 	s := new(Scraper)
@@ -37,16 +37,22 @@ func NewScraper(host string, port int, dbopts ...func(config *database.TwitterBa
 		return nil, err
 	}
 	flog.Infof("Factomd location %s", factomd)
-
-	db, err := database.NewDatabaseWithOpts(dbopts...)
-	if err != nil {
-		panic(err)
-	}
 	s.Database = db
 
 	flog.Infof("Postgres database connected")
 
 	return s, nil
+}
+
+func NewScraper(host string, port int, dbopts ...func(config *database.TwitterBankConfig)) (*Scraper, error) {
+	flog := scraperlog.WithField("func", "NewScraper")
+	db, err := database.NewDatabaseWithOpts(dbopts...)
+	if err != nil {
+		panic(err)
+	}
+	flog.Infof("Postgres database connected")
+
+	return NewScaperWithDB(host, port, db)
 }
 
 func (s *Scraper) Close() {
