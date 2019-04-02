@@ -28,6 +28,20 @@ services:
       - factomd
 
 
+  apiserver:
+    container_name: twitterbank-apiserver
+    build:
+       context: .
+       dockerfile: Dockerfile.apiserver
+    networks:
+      twitterbank:
+    ports:
+        - "8080:8080"
+    depends_on:
+        - db
+        - factomd
+    env_file:
+      - factomd.env
 
   factomd:
     container_name: twitterbank-factomd

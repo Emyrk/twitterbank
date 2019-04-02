@@ -1,5 +1,5 @@
 hash: 7ec0b5ae5d0434c47908dba29d1accf0837d6bb190b509766ec4f63bc2c48bc4
-updated: 2019-04-02T12:50:25.690918595-04:00
+updated: 2019-04-02T14:26:42.39156378-04:00
 imports:
 - name: github.com/beorn7/perks
   version: 3a771d992973f24aa725d07868b467d1ddfceafb
@@ -86,6 +86,21 @@ imports:
   version: ddf22928ea3c56eb4292a0adbbf5001b1e8e7d0d
   subpackages:
   - proto
+- name: github.com/graphql-go/graphql
+  version: a7e15c0298411af18c694ca387e733acef287104
+  subpackages:
+  - gqlerrors
+  - language/ast
+  - language/kinds
+  - language/lexer
+  - language/location
+  - language/parser
+  - language/printer
+  - language/source
+  - language/typeInfo
+  - language/visitor
+- name: github.com/graphql-go/handler
+  version: 28550b403f666810d217c1890a1bfde8a3297494
 - name: github.com/jinzhu/gorm
   version: 8b07437717e71c2ff00602ae19f8353ba10aafbb
   subpackages:
