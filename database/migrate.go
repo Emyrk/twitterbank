@@ -2,12 +2,12 @@ package database
 
 import "github.com/jinzhu/gorm"
 
-// Completed indicates what heights have already been synced
-type Completed struct {
+// CompletedHeight indicates what heights have already been synced
+type CompletedHeight struct {
 	gorm.Model
 	BlockHeight int
 }
 
 func (db *TwitterBankDatabase) AutoMigrate() {
-	db.DB.AutoMigrate(&Completed{})
+	db.DB.AutoMigrate(&CompletedHeight{})
 }
