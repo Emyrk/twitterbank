@@ -1,0 +1,1 @@
+-- Automatically run on creation of database

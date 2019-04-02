@@ -1,0 +1,13 @@
+package: github.com/Emyrk/twitterbank
+import:
+- package: github.com/Emyrk/factom-identity
+- package: github.com/Emyrk/factom-raw
+- package: github.com/FactomProject/factomd
+  subpackages:
+  - common/adminBlock
+  - common/constants
+  - common/entryCreditBlock
+  - common/identity
+  - common/interfaces
+  - common/primitives
+- package: github.com/sirupsen/logrus

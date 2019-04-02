@@ -1,0 +1,4 @@
+FROM factominc/factomd:latest
+COPY factomd_docker/factomd.conf.testnet /root/.factom/m2/factomd.conf
+
+ENTRYPOINT /go/bin/factomd -faulttimeout=120 -network=$NETWORK -customnet=$CUSTOMNET

@@ -1,5 +1,10 @@
 # Twitter Seal
 
+Note
+```
+docker-compose up -d --no-deps --build
+```
+
 # Factom structure
 
 ```bash

@@ -1,0 +1,55 @@
+version: "2"
+
+services:
+  db:
+    container_name: twitterbank-postgres-db
+    build:
+      context: ./postgres_db
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password # TODO: Change this
+    networks:
+      twitterbank:
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  scraper:
+    container_name: twitterbank-scraper
+    build:
+       context: .
+       dockerfile: Dockerfile.scraper
+    # restart: always
+    networks:
+      twitterbank:
+    depends_on:
+      - db
+      - factomd
+
+
+
+  factomd:
+    container_name: twitterbank-factomd
+#    image: factominc/factomd:latest
+    build:
+        context: .
+        dockerfile: Dockerfile.factomd
+    networks:
+        - twitterbank
+    ports:
+        - "8090:8090"
+        - "8088:8088"
+    volumes:
+      - factomd_volume:/root/.factom/
+    env_file:
+      - factomd.env
+
+
+networks:
+  twitterbank:
+   # external: true
+
+volumes:
+  postgres_volume:
+  factomd_volume:
