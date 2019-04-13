@@ -24,7 +24,8 @@ func (api *TwitterBankApiServer) CreateSchema() (graphql.Schema, error) {
 		//"results":              s.results(),
 		//"identityKeysAtHeight": s.identityKeysAtHeight(),
 		//"proposalEntries":      s.proposalEntries(),
-		"properties": api.properties(),
+		"properties": api.Properties(),
+		"user":       api.TwitterUser(),
 	}
 
 	rootQuery := graphql.ObjectConfig{Name: "RootQuery", Fields: fields}
@@ -37,7 +38,7 @@ func (api *TwitterBankApiServer) CreateSchema() (graphql.Schema, error) {
 	return schema, err
 }
 
-func (api *TwitterBankApiServer) properties() *graphql.Field {
+func (api *TwitterBankApiServer) Properties() *graphql.Field {
 	return &graphql.Field{
 		Type: graphql.NewObject(graphql.ObjectConfig{
 			Name:        "Properties",

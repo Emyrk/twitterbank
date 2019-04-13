@@ -31,6 +31,14 @@ You can use https://tweeterid.com/ to find a twitter handle id.
 
 By including data such as the twitter handle id, and tweet id, it prevents replys across other chains
 
+# Twitter Objects
+
+- **Mentions**
+- **Hashtags**
+- Cashtags
+- Media
+- Native Media
+
 # Questions:
 - Can you edit a tweet? :: NO!
 - Do we have any replay issues?

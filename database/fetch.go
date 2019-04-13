@@ -13,3 +13,12 @@ func (db *TwitterBankDatabase) FetchHighestDBInserted() (int, error) {
 	}
 	return c.BlockHeight, nil
 }
+
+func (db *TwitterBankDatabase) FetchUserByUID(uid string) (*TwitterUser, error) {
+	c := TwitterUser{}
+	dbc := db.DB.Where("user_id_str = ?", uid).Find(&c)
+	if dbc.Error != nil {
+		return nil, dbc.Error
+	}
+	return &c, nil
+}

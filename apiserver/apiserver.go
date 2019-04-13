@@ -8,6 +8,7 @@ import (
 	"github.com/Emyrk/twitterbank/database"
 	"github.com/FactomProject/factom"
 	"github.com/graphql-go/handler"
+	log "github.com/sirupsen/logrus"
 )
 
 type TwitterBankApiServer struct {
@@ -37,7 +38,9 @@ func (api *TwitterBankApiServer) RunDaemon() {
 		RootObjectFn: api.rootObjF,
 	})
 
-	api.srv = &http.Server{Addr: ":8080"}
+	port := 8080
+	log.Infof("Running on localhost:%d", port)
+	api.srv = &http.Server{Addr: fmt.Sprintf(":%d", port)}
 	http.Handle("/graphql", disableCors(h))
 	api.srv.ListenAndServe()
 }

@@ -7,6 +7,8 @@ import (
 
 	"github.com/Emyrk/twitterbank/scraper"
 
+	"fmt"
+
 	"github.com/Emyrk/twitterbank/database"
 	log "github.com/sirupsen/logrus"
 )
@@ -35,6 +37,9 @@ func main() {
 		postgresport = flag.Int("pport", 5432, "Postgres port")
 
 		migrate = flag.Bool("m", false, "Automigrate on launch")
+
+		// For testing
+		testData = flag.Bool("t", false, "Generate Test data")
 	)
 
 	// For Debugging
@@ -52,7 +57,7 @@ func main() {
 		for _ = range c {
 			// sig is a ^C, handle it
 			s.Close()
-			return
+			//return
 		}
 	}()
 
@@ -73,6 +78,12 @@ func main() {
 
 	if *migrate {
 		s.Database.AutoMigrate()
+	}
+
+	if *testData {
+		fmt.Println("Inserting test data.")
+		s.GenerateTestData()
+		return
 	}
 
 	// Kinda hacky, but allows me to only run 1 routine if I want.

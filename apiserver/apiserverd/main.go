@@ -44,6 +44,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	db.DB.LogMode(true)
 	log.Infof("Postgres database connected at %s:%d", *postgreshost, *postgresport)
 
 	api, err := apiserver.NewTwitterBankApiServerFromDb(*factomdhost, *factomdport, db)
