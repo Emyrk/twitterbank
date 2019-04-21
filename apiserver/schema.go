@@ -26,6 +26,7 @@ func (api *TwitterBankApiServer) CreateSchema() (graphql.Schema, error) {
 		//"proposalEntries":      s.proposalEntries(),
 		"properties": api.Properties(),
 		"user":       api.TwitterUser(),
+		"tweet":      api.Tweet(),
 	}
 
 	rootQuery := graphql.ObjectConfig{Name: "RootQuery", Fields: fields}

@@ -22,3 +22,12 @@ func (db *TwitterBankDatabase) FetchUserByUID(uid string) (*TwitterUser, error) 
 	}
 	return &c, nil
 }
+
+func (db *TwitterBankDatabase) FetchTweetByTID(tid string) (*TwitterTweetObject, error) {
+	c := TwitterTweetObject{}
+	dbc := db.DB.Where("tweet_id_str = ?", tid).Find(&c)
+	if dbc.Error != nil {
+		return nil, dbc.Error
+	}
+	return &c, nil
+}

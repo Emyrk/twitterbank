@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -49,7 +48,6 @@ type TwitterUser struct {
 }
 
 func (u *TwitterUser) FindTweets(db *gorm.DB, limit, offset int) error {
-	fmt.Println("AAA", limit, offset)
 	dbc := db.Limit(limit).Offset(offset).Model(u).Related(&u.Tweets, "TweetAuthorIDStr")
 	return dbc.Error
 }

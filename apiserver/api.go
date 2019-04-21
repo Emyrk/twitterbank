@@ -49,14 +49,15 @@ func (api *TwitterBankApiServer) TwitterUser() *graphql.Field {
 func (api *TwitterBankApiServer) TwitterUserType() *graphql.Object {
 	return graphql.NewObject(graphql.ObjectConfig{
 		Name:        "TwitterUser",
-		Description: "A user on Twitter",
+		Description: "Fetch a user on Twitter",
 		Fields: graphql.Fields{
 			"user_id_str": &graphql.Field{
 				Type:        graphql.String,
 				Description: "User ID of a given twitter user",
 			},
 			"tweets": &graphql.Field{
-				Type: graphql.NewList(api.TwitterTweetType()),
+				Type:        graphql.NewList(api.TwitterTweetType()),
+				Description: "List all tweets by the given user.",
 				Args: graphql.FieldConfigArgument{
 					"limit": &graphql.ArgumentConfig{
 						Type:        graphql.Int,
@@ -75,6 +76,27 @@ func (api *TwitterBankApiServer) TwitterUserType() *graphql.Object {
 					l, o := getLimitAndOffset("tweet_count", p)
 					err := tu.FindTweets(api.DB.DB, l, o)
 					return tu.Tweets, err
+				},
+			},
+		}})
+}
+
+func (api *TwitterBankApiServer) Tweet() *graphql.Object {
+	return graphql.NewObject(graphql.ObjectConfig{
+		Name:        "TwitterTweet",
+		Description: "Fetch a tweet on Twitter",
+		Fields: graphql.Fields{
+			"tweet": &graphql.Field{
+				Type: api.TwitterTweetType(),
+				Args: graphql.FieldConfigArgument{
+					"tweet_id": &graphql.ArgumentConfig{
+						Type:        graphql.NewNonNull(graphql.String),
+						Description: "The tweet id of the wanted tweet.",
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					tid := p.Args["tweet_id"]
+					return api.DB.FetchTweetByTID(tid.(string))
 				},
 			},
 		}})
