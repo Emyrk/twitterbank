@@ -136,6 +136,22 @@ MainCatchupLoop:
 
 		var _, _, _ = fblock, ablock, ecblock
 
+		for _, eblockEntry := range dblock.GetEBlockDBEntries() {
+			eblock, err := s.Factom.FetchEBlock(eblockEntry.GetKeyMR())
+			if err != nil {
+				errorAndWait(flog.WithField("fetch", "eblock"), err)
+				continue
+			}
+
+			for _, ehash := range eblock.GetEntryHashes() {
+				if ehash.IsMinuteMarker() {
+					continue
+				}
+
+				// TODO: Partse each entry
+			}
+		}
+
 		err = s.Database.InsertCompletedHeight(int(next))
 		if err != nil {
 			errorAndWait(flog.WithField("insert", "completed"), err)
