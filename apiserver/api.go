@@ -13,6 +13,15 @@ var (
 	}
 )
 
+type GraphQLAPITypes struct {
+	TwitterTweetSingleton *graphql.Object
+}
+
+func (api *TwitterBankApiServer) init() {
+	api.apiTypes = new(GraphQLAPITypes)
+	api.apiTypes.TwitterTweetSingleton = api.TwitterTweetType()
+}
+
 func getLimitAndOffset(api string, p graphql.ResolveParams) (int, int) {
 	v := APILimits[api]
 	def, max := v[0], v[1]
@@ -56,7 +65,7 @@ func (api *TwitterBankApiServer) TwitterUserType() *graphql.Object {
 				Description: "User ID of a given twitter user",
 			},
 			"tweets": &graphql.Field{
-				Type:        graphql.NewList(TwitterTweetType),
+				Type:        graphql.NewList(api.apiTypes.TwitterTweetSingleton),
 				Description: "List all tweets by the given user.",
 				Args: graphql.FieldConfigArgument{
 					"limit": &graphql.ArgumentConfig{
@@ -85,7 +94,7 @@ func (api *TwitterBankApiServer) Tweet() *graphql.Field {
 	return &graphql.Field{
 		Name:        "Tweet",
 		Description: "Fetch a tweet on Twitter",
-		Type:        TwitterTweetType,
+		Type:        api.apiTypes.TwitterTweetSingleton,
 		Args: graphql.FieldConfigArgument{
 			"tweet_id": &graphql.ArgumentConfig{
 				Type:        graphql.NewNonNull(graphql.String),
@@ -99,32 +108,108 @@ func (api *TwitterBankApiServer) Tweet() *graphql.Field {
 	}
 }
 
-var TwitterTweetType = graphql.NewObject(graphql.ObjectConfig{
-	Name:        "TwitterTweet",
-	Description: "A tweet on Twitter",
+func (api *TwitterBankApiServer) TwitterTweetType() *graphql.Object {
+	return graphql.NewObject(graphql.ObjectConfig{
+		Name:        "TwitterTweet",
+		Description: "A tweet on Twitter",
+		Fields: graphql.Fields{
+			"tweet_id_str": &graphql.Field{
+				Type:        graphql.String,
+				Description: "Tweet unique id.",
+			},
+			"tweet_author_str": &graphql.Field{
+				Type:        graphql.String,
+				Description: "User ID of the tweet author.",
+			},
+			"chain_id": &graphql.Field{
+				Type:        graphql.String,
+				Description: "Chain ID of the author for this tweet.",
+			},
+			"entry_hash": &graphql.Field{
+				Type:        graphql.String,
+				Description: "Entryhash of the FIRST factom record of this tweet.",
+			},
+			"tweet_hash": &graphql.Field{
+				Type:        graphql.String,
+				Description: "SHA256 Hash of the tweet text",
+			},
+			"tweeted_time": &graphql.Field{
+				Type:        graphql.DateTime,
+				Description: "Time the tweet was tweeted on the twitter platform.",
+			},
+			"proofs": &graphql.Field{
+				Type:        graphql.NewList(TwitterTweetProofType),
+				Description: "Recorded proofs into the Factom blockchain",
+				Args: graphql.FieldConfigArgument{
+					"limit": &graphql.ArgumentConfig{
+						Type:        graphql.Int,
+						Description: "If fetching tweets, use a limit to the number of tweets.",
+					},
+					"offset": &graphql.ArgumentConfig{
+						Type:        graphql.Int,
+						Description: "If fetching tweets, use a offset to the tweets retrieved.",
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					tu, ok := p.Source.(*database.TwitterTweetObject)
+					if !ok {
+						tuBase, ok := p.Source.(database.TwitterTweetObject)
+						if !ok {
+							return nil, fmt.Errorf("Tweet not found")
+						}
+						tu = &tuBase
+					}
+					l, o := getLimitAndOffset("tweet_count", p)
+					err := tu.FindProofs(api.DB.DB, l, o)
+					return tu.Proofs, err
+				},
+			},
+		}})
+}
+
+var TwitterTweetProofType = graphql.NewObject(graphql.ObjectConfig{
+	Name:        "FactomProof",
+	Description: "Recorded proof of tweet by a Factom Identity.",
 	Fields: graphql.Fields{
-		"tweet_id_str": &graphql.Field{
+		"identity": &graphql.Field{
 			Type:        graphql.String,
-			Description: "Tweet unique id.",
+			Description: "Recording Identity.",
 		},
 		"tweet_author_str": &graphql.Field{
 			Type:        graphql.String,
-			Description: "User ID of the tweet author.",
+			Description: "Unique id of the author of the tweet, given by Twitter.com.",
 		},
-		"chain_id": &graphql.Field{
+		"tweet_id_str": &graphql.Field{
 			Type:        graphql.String,
-			Description: "Chain ID of the author for this tweet.",
-		},
-		"entry_hash": &graphql.Field{
-			Type:        graphql.String,
-			Description: "Entryhash of the FIRST factom record of this tweet.",
+			Description: "Unique id of the tweet, given by Twitter.com.",
 		},
 		"tweet_hash": &graphql.Field{
 			Type:        graphql.String,
-			Description: "SHA256 Hash of the tweet text",
+			Description: "SHA256 hash of the tweet's text.",
 		},
-		"tweeted_time": &graphql.Field{
-			Type:        graphql.DateTime,
-			Description: "Time the tweet was tweeted on the twitter platform.",
+		"chain_id": &graphql.Field{
+			Type:        graphql.String,
+			Description: "Chain id of the entry of proof.",
 		},
-	}})
+		"entry_hash": &graphql.Field{
+			Type:        graphql.String,
+			Description: "Entry hash of the entry of proof.",
+		},
+		"signing_key": &graphql.Field{
+			Type:        graphql.String,
+			Description: "Signing key used by Identity",
+		},
+		"signature": &graphql.Field{
+			Type:        graphql.String,
+			Description: "Signature of record",
+		},
+		"tweet_recorded_time": &graphql.Field{
+			Type:        graphql.String,
+			Description: "Time recorded into the Factom Blockchain",
+		},
+		"block_height": &graphql.Field{
+			Type:        graphql.String,
+			Description: "Block height of record in Factom Blockchain",
+		},
+	},
+})

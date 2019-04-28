@@ -33,6 +33,8 @@ func main() {
 		postgreshost = flag.String("phost", "localhost", "Postgres host")
 		postgresport = flag.Int("pport", 5432, "Postgres port")
 
+		apiport = flag.Int("port", 8080, "Apiserver Port")
+
 		migrate = flag.Bool("m", false, "Automigrate on launch")
 	)
 
@@ -51,6 +53,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	api.ChangeListenPort(*apiport)
 
 	// Graceful Close
 	c := make(chan os.Signal, 1)

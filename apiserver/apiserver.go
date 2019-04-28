@@ -12,8 +12,12 @@ import (
 )
 
 type TwitterBankApiServer struct {
-	DB  *database.TwitterBankDatabase
-	srv *http.Server
+	DB   *database.TwitterBankDatabase
+	srv  *http.Server
+	port int
+
+	// Singleton Types
+	apiTypes *GraphQLAPITypes
 }
 
 func NewTwitterBankApiServerFromDb(factomdHost string, factomdPort int, db *database.TwitterBankDatabase) (*TwitterBankApiServer, error) {
@@ -21,7 +25,13 @@ func NewTwitterBankApiServerFromDb(factomdHost string, factomdPort int, db *data
 	s.DB = db
 
 	factom.SetFactomdServer(fmt.Sprintf("%s:%d", factomdHost, factomdPort))
+	s.init()
 	return s, nil
+}
+
+// ChangeListenPort can only be set before it is run
+func (api *TwitterBankApiServer) ChangeListenPort(port int) {
+	api.port = port
 }
 
 func (api *TwitterBankApiServer) RunDaemon() {
@@ -38,11 +48,13 @@ func (api *TwitterBankApiServer) RunDaemon() {
 		RootObjectFn: api.rootObjF,
 	})
 
-	port := 8080
-	log.Infof("Running on localhost:%d", port)
-	api.srv = &http.Server{Addr: fmt.Sprintf(":%d", port)}
+	log.Infof("Running on localhost:%d", api.port)
+	api.srv = &http.Server{Addr: fmt.Sprintf(":%d", api.port)}
 	http.Handle("/graphql", disableCors(h))
-	api.srv.ListenAndServe()
+	err = api.srv.ListenAndServe()
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func (api *TwitterBankApiServer) Close() error {

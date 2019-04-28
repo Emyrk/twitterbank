@@ -22,7 +22,7 @@ type TwitterTweetObject struct {
 	//gorm.Model
 	// Integer based indexes are faster. Twitter reccomends the string
 	TweetAuthorID    int64  `json:"tweet_author"`
-	TweetAuthorIDStr string `json:"tweet_author_str"`
+	TweetAuthorIDStr string `json:"tweet_author_str" gorm:"index"`
 	ChainID          string `json:"chain_id"`
 	EntryHash        string `json:"entry_hash"`
 
@@ -38,6 +38,14 @@ type TwitterTweetObject struct {
 	TweetCreatedAt time.Time `json:"tweeted_time"`
 
 	// TODO: Handle Quotes and Retweets
+
+	// Associations
+	Proofs []TwitterTweetRecord `json:"proofs" gorm:"foreignkey:TweetIDStr;association_foreignkey:TweetIDStr"`
+}
+
+func (t *TwitterTweetObject) FindProofs(db *gorm.DB, limit, offset int) error {
+	dbc := db.Limit(limit).Offset(offset).Model(t).Related(&t.Proofs, "TweetIDStr")
+	return dbc.Error
 }
 
 // Collaborate checks the fields in the tweet object match that in the content.
@@ -57,15 +65,15 @@ func (t TwitterTweetObject) Collaborate(content *FactomTweetContent) bool {
 }
 
 type TwitterTweetRecord struct {
-	// Factom Identity
-	FactomRecorder string `json:"record_identity" gorm:"primary_key"`
-
 	// Twitter Related IDs
 	TweetAuthorID    int64  `json:"tweet_author"`
-	TweetAuthorIDStr string `json:"tweet_author_str"`
+	TweetAuthorIDStr string `json:"tweet_author_str" gorm:"index"`
 	TweetID          int64  `json:"tweet_id"`
 	TweetIDStr       string `json:"tweet_id_str" gorm:"primary_key"`
 	TweetHash        string `json:"tweet_hash"`
+
+	// Factom Identity
+	FactomRecorder string `json:"record_identity" gorm:"primary_key"`
 
 	ChainID    string `json:"chain_id"`
 	EntryHash  string `json:"entry_hash"`
