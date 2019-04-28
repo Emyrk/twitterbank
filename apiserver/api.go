@@ -34,13 +34,13 @@ func (api *TwitterBankApiServer) TwitterUser() *graphql.Field {
 		Type:        api.TwitterUserType(),
 		Description: "A user on Twitter.",
 		Args: graphql.FieldConfigArgument{
-			"userid": &graphql.ArgumentConfig{
+			"user_id": &graphql.ArgumentConfig{
 				Type:        graphql.NewNonNull(graphql.String),
 				Description: "The uid of the twitter user",
 			},
 		},
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-			uid := params.Args["userid"].(string)
+			uid := params.Args["user_id"].(string)
 			return api.DB.FetchUserByUID(uid)
 		},
 	}
@@ -56,7 +56,7 @@ func (api *TwitterBankApiServer) TwitterUserType() *graphql.Object {
 				Description: "User ID of a given twitter user",
 			},
 			"tweets": &graphql.Field{
-				Type:        graphql.NewList(api.TwitterTweetType()),
+				Type:        graphql.NewList(TwitterTweetType),
 				Description: "List all tweets by the given user.",
 				Args: graphql.FieldConfigArgument{
 					"limit": &graphql.ArgumentConfig{
@@ -81,39 +81,50 @@ func (api *TwitterBankApiServer) TwitterUserType() *graphql.Object {
 		}})
 }
 
-func (api *TwitterBankApiServer) Tweet() *graphql.Object {
-	return graphql.NewObject(graphql.ObjectConfig{
-		Name:        "TwitterTweet",
+func (api *TwitterBankApiServer) Tweet() *graphql.Field {
+	return &graphql.Field{
+		Name:        "Tweet",
 		Description: "Fetch a tweet on Twitter",
-		Fields: graphql.Fields{
-			"tweet": &graphql.Field{
-				Type: api.TwitterTweetType(),
-				Args: graphql.FieldConfigArgument{
-					"tweet_id": &graphql.ArgumentConfig{
-						Type:        graphql.NewNonNull(graphql.String),
-						Description: "The tweet id of the wanted tweet.",
-					},
-				},
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					tid := p.Args["tweet_id"]
-					return api.DB.FetchTweetByTID(tid.(string))
-				},
+		Type:        TwitterTweetType,
+		Args: graphql.FieldConfigArgument{
+			"tweet_id": &graphql.ArgumentConfig{
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "The tweet id of the wanted tweet.",
 			},
-		}})
+		},
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			tid := p.Args["tweet_id"]
+			return api.DB.FetchTweetByTID(tid.(string))
+		},
+	}
 }
 
-func (api *TwitterBankApiServer) TwitterTweetType() *graphql.Object {
-	return graphql.NewObject(graphql.ObjectConfig{
-		Name:        "TwitterTweet",
-		Description: "A tweet on Twitter",
-		Fields: graphql.Fields{
-			"tweet_id_str": &graphql.Field{
-				Type:        graphql.String,
-				Description: "User ID of a given twitter user",
-			},
-			"tweet_author_str": &graphql.Field{
-				Type:        graphql.String,
-				Description: "User ID of a given twitter user",
-			},
-		}})
-}
+var TwitterTweetType = graphql.NewObject(graphql.ObjectConfig{
+	Name:        "TwitterTweet",
+	Description: "A tweet on Twitter",
+	Fields: graphql.Fields{
+		"tweet_id_str": &graphql.Field{
+			Type:        graphql.String,
+			Description: "Tweet unique id.",
+		},
+		"tweet_author_str": &graphql.Field{
+			Type:        graphql.String,
+			Description: "User ID of the tweet author.",
+		},
+		"chain_id": &graphql.Field{
+			Type:        graphql.String,
+			Description: "Chain ID of the author for this tweet.",
+		},
+		"entry_hash": &graphql.Field{
+			Type:        graphql.String,
+			Description: "Entryhash of the FIRST factom record of this tweet.",
+		},
+		"tweet_hash": &graphql.Field{
+			Type:        graphql.String,
+			Description: "SHA256 Hash of the tweet text",
+		},
+		"tweeted_time": &graphql.Field{
+			Type:        graphql.DateTime,
+			Description: "Time the tweet was tweeted on the twitter platform.",
+		},
+	}})

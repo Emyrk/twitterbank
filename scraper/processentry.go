@@ -129,6 +129,7 @@ func (p *Processor) ProcessTwitterEntry(entry interfaces.IEBEntry, dblock interf
 		TweetIDStr:       tweet_id_str,
 		TweetID:          tweet_id,
 		ChainID:          entry.GetChainID().String(),
+		EntryHash:        entry.GetHash().String(),
 		TweetCreatedAt:   created_date,
 		RawTweet:         string(entry.GetContent()),
 	}

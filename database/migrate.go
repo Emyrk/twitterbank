@@ -24,6 +24,7 @@ type TwitterTweetObject struct {
 	TweetAuthorID    int64  `json:"tweet_author"`
 	TweetAuthorIDStr string `json:"tweet_author_str"`
 	ChainID          string `json:"chain_id"`
+	EntryHash        string `json:"entry_hash"`
 
 	TweetID    int64  `json:"tweet_id"`
 	TweetIDStr string `json:"tweet_id_str" gorm:"primary_key"`
@@ -34,7 +35,7 @@ type TwitterTweetObject struct {
 
 	// Some fields will be parsed for better searching
 	//	The time the tweet was tweeted
-	TweetCreatedAt time.Time `json:"tweet_created_time"`
+	TweetCreatedAt time.Time `json:"tweeted_time"`
 
 	// TODO: Handle Quotes and Retweets
 }
