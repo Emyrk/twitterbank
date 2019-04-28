@@ -5,6 +5,7 @@ import (
 	"math/rand"
 
 	"github.com/Emyrk/twitterbank/database"
+	"github.com/FactomProject/factomd/common/primitives"
 )
 
 func (s *Scraper) GenerateTestData() {
@@ -15,7 +16,7 @@ func (s *Scraper) GenerateTestData() {
 
 		for i := 0; i < 25; i++ {
 			tid := rand.Int63()
-			t := database.TwitterTweetObject{TweetID: tid, TweetIDStr: fmt.Sprintf("%d", tid), TweetAuthorID: uid, TweetAuthorIDStr: fmt.Sprintf("%d", uid)}
+			t := database.TwitterTweetObject{TweetID: tid, TweetIDStr: fmt.Sprintf("%d", tid), TweetAuthorID: uid, TweetAuthorIDStr: fmt.Sprintf("%d", uid), TweetHash: primitives.RandomHash().String()}
 			s.Database.DB.Create(&t)
 		}
 	}

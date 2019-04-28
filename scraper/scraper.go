@@ -14,9 +14,10 @@ import (
 var scraperlog = log.WithFields(log.Fields{"file": "scraper.go"})
 
 type Scraper struct {
-	Factom   factom_raw.Fetcher
-	Database *database.TwitterBankDatabase
-	quit     bool
+	Factom    factom_raw.Fetcher
+	Database  *database.TwitterBankDatabase
+	quit      bool
+	processor *Processor
 }
 
 type DatabaseConfig struct {
@@ -40,6 +41,7 @@ func NewScaperWithDB(host string, port int, db *database.TwitterBankDatabase) (*
 	s.Database = db
 
 	flog.Infof("Postgres database connected")
+	s.processor = NewProcessor(s)
 
 	return s, nil
 }
@@ -148,7 +150,17 @@ MainCatchupLoop:
 					continue
 				}
 
-				// TODO: Partse each entry
+				entry, err := s.Factom.FetchEntry(ehash)
+				if err != nil {
+					errorAndWait(flog.WithField("fetch", "entry"), err)
+					continue
+				}
+
+				err = s.processor.ProcessEntry(entry, dblock)
+				if err != nil {
+					errorAndWait(flog.WithField("process", "entry"), err)
+					continue
+				}
 			}
 		}
 

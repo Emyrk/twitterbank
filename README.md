@@ -7,6 +7,22 @@ docker-compose up -d --no-deps --build
 
 # Factom structure
 
+Per Accoutn (Chain)
+```bash
+{
+  "extids":[
+    "TwitterBank Chain", # Used to identify an entry for this project
+    "TWITTER_HANDLE_ID", # To be able to find twitter user (use id not handle)
+  ],
+  "content": {
+    # Might add stuff like current twitter name and stuff?
+  }
+}
+
+```
+
+Per Record
+
 ```bash
 {
   "extids":[
