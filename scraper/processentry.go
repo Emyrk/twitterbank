@@ -3,6 +3,8 @@ package scraper
 import (
 	"strconv"
 
+	"fmt"
+
 	"github.com/Emyrk/twitterbank/database"
 	"github.com/FactomProject/factomd/common/interfaces"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -141,7 +143,7 @@ func (p *Processor) ProcessTwitterEntry(entry interfaces.IEBEntry, dblock interf
 	}
 
 	// TODO: Verify Identity
-	identity := string(entry.ExternalIDs()[3])
+	identity := fmt.Sprintf("%x", entry.ExternalIDs()[3])
 	// TODO: Verify Signature
 	// TODO: Verify key
 
@@ -154,8 +156,8 @@ func (p *Processor) ProcessTwitterEntry(entry interfaces.IEBEntry, dblock interf
 		TweetID:          tweet_id,
 		TweetIDStr:       tweet_id_str,
 		TweetHash:        string(tweet_content.TweetHash()),
-		Signature:        string(entry.ExternalIDs()[5]),
-		SigningKey:       string(entry.ExternalIDs()[4]),
+		Signature:        fmt.Sprintf("%x", entry.ExternalIDs()[5]),
+		SigningKey:       fmt.Sprintf("%x", entry.ExternalIDs()[4]),
 		TweetRecordedAt:  dblock.GetTimestamp().GetTime(),
 		BlockHeight:      int(dblock.GetDatabaseHeight()),
 	}
