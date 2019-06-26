@@ -11,6 +11,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+var TestingString = "testing_kafka24"
+
 var processLog = log.WithFields(log.Fields{"file": "processentry"})
 
 type Processor struct {
@@ -44,8 +46,12 @@ func (s *Processor) ProcessEntry(entry interfaces.IEBEntry, dblock interfaces.ID
 func (p *Processor) ProcessTwitterChain(entry interfaces.IEBEntry, dblock interfaces.IDirectoryBlock) error {
 	flog := processLog.WithFields(log.Fields{"func": "ProcessTwitterChain"})
 	// Improper start to chain
-	if len(entry.ExternalIDs()) != 2 {
+	if len(entry.ExternalIDs()) != 3 {
 		log.Warnf("Chain %s has improper length extids to start chain", entry.GetChainID().String())
+		return nil
+	}
+
+	if string(entry.ExternalIDs()[2]) != TestingString {
 		return nil
 	}
 
