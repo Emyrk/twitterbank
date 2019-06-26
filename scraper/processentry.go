@@ -35,6 +35,10 @@ func (s *Processor) ProcessEntry(entry interfaces.IEBEntry, dblock interfaces.ID
 	}
 	switch string(entry.ExternalIDs()[0]) {
 	case "TwitterBank Record":
+		// TODO: Remove this hack
+		if len(entry.ExternalIDs()) == 3 {
+			return s.ProcessTwitterChain(entry, dblock)
+		}
 		return s.ProcessTwitterEntry(entry, dblock)
 	case "TwitterBank Chain":
 		return s.ProcessTwitterChain(entry, dblock)
