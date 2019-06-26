@@ -33,7 +33,9 @@ func (s *Processor) ProcessEntry(entry interfaces.IEBEntry, dblock interfaces.ID
 	}
 	switch string(entry.ExternalIDs()[0]) {
 	case "TwitterBank Record":
+		return s.ProcessTwitterEntry(entry, dblock)
 	case "TwitterBank Chain":
+		return s.ProcessTwitterChain(entry, dblock)
 	}
 
 	return nil
