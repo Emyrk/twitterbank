@@ -39,6 +39,24 @@ func (api *TwitterBankApiServer) Properties() *graphql.Field {
 						return api.DB.FetchHighestDBInserted()
 					},
 				},
+				"totalTrackedUsers": &graphql.Field{
+					Type: graphql.Int,
+					Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+						return api.DB.FetchTotalNumberOfUsers()
+					},
+				},
+				"totalNumberOfTweets": &graphql.Field{
+					Type: graphql.Int,
+					Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+						return api.DB.FetchTotalNumberOfTweets()
+					},
+				},
+				"totalNumberOfRecords": &graphql.Field{
+					Type: graphql.Int,
+					Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+						return api.DB.FetchTotalNumberOfTweetRecords()
+					},
+				},
 				"factomdProperties": &graphql.Field{
 					Type: api.FactomdProperties(),
 					Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -98,24 +116,6 @@ func (api *TwitterBankApiServer) FactomdProperties() *graphql.Object {
 						return nil, fmt.Errorf("Incorrect type supplied")
 					}
 					return lst[3], nil
-				},
-			},
-			"totalTrackedUsers": &graphql.Field{
-				Type: graphql.Int,
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					return api.DB.FetchTotalNumberOfUsers()
-				},
-			},
-			"totalNumberOfTweets": &graphql.Field{
-				Type: graphql.Int,
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					return api.DB.FetchTotalNumberOfTweets()
-				},
-			},
-			"totalNumberOfRecords": &graphql.Field{
-				Type: graphql.Int,
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					return api.DB.FetchTotalNumberOfTweetRecords()
 				},
 			},
 		}})
