@@ -40,6 +40,16 @@ func getLimitAndOffset(api string, p graphql.ResolveParams) (int, int) {
 	return def, o
 }
 
+func (api *TwitterBankApiServer) TwitterUsers() *graphql.Field {
+	return &graphql.Field{
+		Type:        graphql.NewList(api.TwitterUserType()),
+		Description: "All users being tracked",
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			return api.DB.FetchAllUsers()
+		},
+	}
+}
+
 func (api *TwitterBankApiServer) TwitterUser() *graphql.Field {
 	return &graphql.Field{
 		Type:        api.TwitterUserType(),
@@ -80,6 +90,10 @@ func (api *TwitterBankApiServer) TwitterUserType() *graphql.Object {
 					},
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					fmt.Printf("%v\n",p.Context)
+					fmt.Printf("%v\n",p.Args)
+					fmt.Printf("%v\n",p.Info)
+					fmt.Printf("%v\n", p.Source)
 					tu, ok := p.Source.(*database.TwitterUser)
 					if !ok {
 						return nil, fmt.Errorf("Twitter user not found")

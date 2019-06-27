@@ -23,6 +23,38 @@ func (db *TwitterBankDatabase) FetchUserByUID(uid string) (*TwitterUser, error) 
 	return &c, nil
 }
 
+func (db *TwitterBankDatabase) FetchAllUsers() ([]TwitterUser, error) {
+	users := []TwitterUser{}
+	dbc := db.DB.Find(&users)
+	if dbc.Error != nil {
+		return nil, dbc.Error
+	}
+	return users, nil
+}
+
+func (db *TwitterBankDatabase) FetchTotalNumberOfUsers() (int, error) {
+	return db.TableCount("twitter_users")
+
+}
+
+func (db *TwitterBankDatabase) FetchTotalNumberOfTweets() (int, error) {
+	return db.TableCount("twitter_tweet_objects")
+
+}
+
+func (db *TwitterBankDatabase) FetchTotalNumberOfTweetRecords() (int, error) {
+	return db.TableCount("twitter_tweet_records")
+}
+
+func (db *TwitterBankDatabase) TableCount(table string) (int, error) {
+	count := 0
+	dbc := db.DB.Table(table).Count(&count)
+	if dbc.Error != nil {
+		return count, dbc.Error
+	}
+	return count, nil
+}
+
 func (db *TwitterBankDatabase) FetchTweetByTID(tid string) (*TwitterTweetObject, error) {
 	c := TwitterTweetObject{}
 	dbc := db.DB.Where("tweet_id_str = ?", tid).Find(&c)

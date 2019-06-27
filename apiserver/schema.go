@@ -66,49 +66,69 @@ func (api *TwitterBankApiServer) Properties() *graphql.Field {
 	}
 }
 
-var FactomdProperties = graphql.NewObject(graphql.ObjectConfig{
-	Name:        "FactomdProperties",
-	Description: "Factomd Version",
-	Fields: graphql.Fields{
-		"factomdVersion": &graphql.Field{
-			Type:        graphql.String,
-			Description: "Version of factomd the scraper is talking to.",
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				lst, ok := p.Source.([]string)
-				if !ok {
-					return nil, fmt.Errorf("Incorrect type supplied")
-				}
-				return lst[0], nil
+func (api *TwitterBankApiServer) FactomdProperties() *graphql.Object {
+	return graphql.NewObject(graphql.ObjectConfig{
+		Name:        "FactomdProperties",
+		Description: "Factomd Version",
+		Fields: graphql.Fields{
+			"factomdVersion": &graphql.Field{
+				Type:        graphql.String,
+				Description: "Version of factomd the scraper is talking to.",
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					lst, ok := p.Source.([]string)
+					if !ok {
+						return nil, fmt.Errorf("Incorrect type supplied")
+					}
+					return lst[0], nil
+				},
 			},
-		},
-		"factomdVersionError": &graphql.Field{
-			Type: graphql.String,
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				lst, ok := p.Source.([]string)
-				if !ok {
-					return nil, fmt.Errorf("Incorrect type supplied")
-				}
-				return lst[1], nil
+			"factomdVersionError": &graphql.Field{
+				Type: graphql.String,
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					lst, ok := p.Source.([]string)
+					if !ok {
+						return nil, fmt.Errorf("Incorrect type supplied")
+					}
+					return lst[1], nil
+				},
 			},
-		},
-		"factomdAPIVersion": &graphql.Field{
-			Type: graphql.String,
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				lst, ok := p.Source.([]string)
-				if !ok {
-					return nil, fmt.Errorf("Incorrect type supplied")
-				}
-				return lst[2], nil
+			"factomdAPIVersion": &graphql.Field{
+				Type: graphql.String,
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					lst, ok := p.Source.([]string)
+					if !ok {
+						return nil, fmt.Errorf("Incorrect type supplied")
+					}
+					return lst[2], nil
+				},
 			},
-		},
-		"factomdAPIVersionError": &graphql.Field{
-			Type: graphql.String,
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				lst, ok := p.Source.([]string)
-				if !ok {
-					return nil, fmt.Errorf("Incorrect type supplied")
-				}
-				return lst[3], nil
+			"factomdAPIVersionError": &graphql.Field{
+				Type: graphql.String,
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					lst, ok := p.Source.([]string)
+					if !ok {
+						return nil, fmt.Errorf("Incorrect type supplied")
+					}
+					return lst[3], nil
+				},
 			},
-		},
-	}})
+			"totalTrackedUsers": &graphql.Field{
+				Type: graphql.Int,
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					return api.DB.FetchTotalNumberOfUsers()
+				},
+			},
+			"totalNumberOfTweets": &graphql.Field{
+				Type: graphql.Int,
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					return api.DB.FetchTotalNumberOfTweets()
+				},
+			},
+			"totalNumberOfRecords": &graphql.Field{
+				Type: graphql.Int,
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					return api.DB.FetchTotalNumberOfTweetRecords()
+				},
+			},
+		}})
+}
