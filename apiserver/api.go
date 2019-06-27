@@ -2,6 +2,7 @@ package apiserver
 
 import (
 	"fmt"
+
 	"github.com/graphql-go/graphql/language/ast"
 	"github.com/graphql-go/graphql/language/kinds"
 
@@ -16,12 +17,44 @@ var (
 )
 
 type GraphQLAPITypes struct {
-	TwitterTweetSingleton *graphql.Object
+	TwitterTweetSingleton        *graphql.Object
+	TwitterUserSingletonNoTweets *graphql.Object
+	TwitterUserSingleton         *graphql.Object
 }
 
 func (api *TwitterBankApiServer) init() {
 	api.apiTypes = new(GraphQLAPITypes)
 	api.apiTypes.TwitterTweetSingleton = api.TwitterTweetType()
+	api.apiTypes.TwitterUserSingletonNoTweets = api.TwitterUserType()
+	api.apiTypes.TwitterUserSingleton = api.TwitterUserType()
+	api.apiTypes.TwitterUserSingleton.PrivateName = "TwitteUserAndTweets"
+	api.apiTypes.TwitterUserSingleton.AddFieldConfig("tweets", &graphql.Field{
+		Type:        graphql.NewList(api.apiTypes.TwitterTweetSingleton),
+		Description: "List all tweets by the given user.",
+		Args: graphql.FieldConfigArgument{
+			"limit": &graphql.ArgumentConfig{
+				Type:        graphql.Int,
+				Description: "If fetching tweets, use a limit to the number of tweets.",
+			},
+			"offset": &graphql.ArgumentConfig{
+				Type:        graphql.Int,
+				Description: "If fetching tweets, use a offset to the tweets retrieved.",
+			},
+		},
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			fmt.Printf("%v\n", p.Context)
+			fmt.Printf("%v\n", p.Args)
+			fmt.Printf("%v\n", p.Info)
+			fmt.Printf("%v\n", p.Source)
+			tu, ok := p.Source.(*database.TwitterUser)
+			if !ok {
+				return nil, fmt.Errorf("Twitter user not found")
+			}
+			l, o := getLimitAndOffset("tweet_count", p)
+			err := tu.FindTweets(api.DB.DB, l, o)
+			return tu.Tweets, err
+		},
+	})
 }
 
 func getLimitAndOffset(api string, p graphql.ResolveParams) (int, int) {
@@ -42,7 +75,7 @@ func getLimitAndOffset(api string, p graphql.ResolveParams) (int, int) {
 
 func (api *TwitterBankApiServer) TwitterUsers() *graphql.Field {
 	return &graphql.Field{
-		Type:        graphql.NewList(api.TwitterUserType()),
+		Type:        graphql.NewList(api.apiTypes.TwitterUserSingletonNoTweets),
 		Description: "All users being tracked",
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 			return api.DB.FetchAllUsers()
@@ -52,7 +85,7 @@ func (api *TwitterBankApiServer) TwitterUsers() *graphql.Field {
 
 func (api *TwitterBankApiServer) TwitterUser() *graphql.Field {
 	return &graphql.Field{
-		Type:        api.TwitterUserType(),
+		Type:        api.apiTypes.TwitterUserSingleton,
 		Description: "A user on Twitter.",
 		Args: graphql.FieldConfigArgument{
 			"user_id": &graphql.ArgumentConfig{
@@ -75,33 +108,6 @@ func (api *TwitterBankApiServer) TwitterUserType() *graphql.Object {
 			"user_id_str": &graphql.Field{
 				Type:        graphql.String,
 				Description: "User ID of a given twitter user",
-			},
-			"tweets": &graphql.Field{
-				Type:        graphql.NewList(api.apiTypes.TwitterTweetSingleton),
-				Description: "List all tweets by the given user.",
-				Args: graphql.FieldConfigArgument{
-					"limit": &graphql.ArgumentConfig{
-						Type:        graphql.Int,
-						Description: "If fetching tweets, use a limit to the number of tweets.",
-					},
-					"offset": &graphql.ArgumentConfig{
-						Type:        graphql.Int,
-						Description: "If fetching tweets, use a offset to the tweets retrieved.",
-					},
-				},
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					fmt.Printf("%v\n",p.Context)
-					fmt.Printf("%v\n",p.Args)
-					fmt.Printf("%v\n",p.Info)
-					fmt.Printf("%v\n", p.Source)
-					tu, ok := p.Source.(*database.TwitterUser)
-					if !ok {
-						return nil, fmt.Errorf("Twitter user not found")
-					}
-					l, o := getLimitAndOffset("tweet_count", p)
-					err := tu.FindTweets(api.DB.DB, l, o)
-					return tu.Tweets, err
-				},
 			},
 		}})
 }
@@ -153,8 +159,8 @@ func (api *TwitterBankApiServer) TwitterTweetType() *graphql.Object {
 				Type:        graphql.DateTime,
 				Description: "Time the tweet was tweeted on the twitter platform.",
 			},
-			"raw_tweet":&graphql.Field{
-				Type:       JSON,
+			"raw_tweet": &graphql.Field{
+				Type:        JSON,
 				Description: "This field has not been dissected yet",
 			},
 			"proofs": &graphql.Field{
