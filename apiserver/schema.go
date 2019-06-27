@@ -11,22 +11,10 @@ import (
 func (api *TwitterBankApiServer) CreateSchema() (graphql.Schema, error) {
 	// Schema
 	fields := graphql.Fields{
-		//"completed":            s.completedField(),
-		//"proposal":             s.proposal(),
-		//"allProposals":         s.allProposals(),
-		//"eligibleList":         s.eligibleList(),
-		//"eligibleVoters":       s.eligibleListVoters(),
-		//"commit":               s.commit(),
-		//"reveal":               s.reveal(),
-		//"commits":              s.commits(),
-		//"reveals":              s.reveals(),
-		//"result":               s.result(),
-		//"results":              s.results(),
-		//"identityKeysAtHeight": s.identityKeysAtHeight(),
-		//"proposalEntries":      s.proposalEntries(),
 		"properties": api.Properties(),
 		"user":       api.TwitterUser(),
 		"tweet":      api.Tweet(),
+		"allusers":   api.TwitterUsers(),
 	}
 
 	rootQuery := graphql.ObjectConfig{Name: "RootQuery", Fields: fields}
