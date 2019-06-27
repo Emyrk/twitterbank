@@ -76,23 +76,35 @@ func (p *Processor) ProcessTwitterChain(entry interfaces.IEBEntry, dblock interf
 	return p.Database.InsertNewUserChain(&user)
 }
 
+
+const (
+	RecordEntryTitle  = iota
+	RecordTwitterHandleID
+	RecordTwitterTweetID
+	// RecordIdentityRecording // TODO: Renable
+	RecordIdentityKey
+	RecordSignature
+	RecordEnd
+
+)
+
 func (p *Processor) ProcessTwitterEntry(entry interfaces.IEBEntry, dblock interfaces.IDirectoryBlock) error {
 	flog := processLog.WithFields(log.Fields{"func": "ProcessTwitterChain", "entry": entry.GetHash().String()})
 	// Improper start to chain
-	if len(entry.ExternalIDs()) != 6 {
+	if len(entry.ExternalIDs()) != RecordEnd-1 {
 		log.Warnf("Chain %s has improper length extids to start chain", entry.GetChainID().String())
 		return nil
 	}
 
 	//{
-	//	"extids":[
-	//	0 "TwitterBank Record", # Used to identify an entry for this project
-	//	1 "TWITTER_HANDLE_ID", # To be able to find twitter user (use id not handle)
-	//	2 "TWEET_ID", # Tweet id to locate tweet
-	//	3 "IDENTITY_RECORDING", # Identity wotnessing tweet
-	//	4 "IDENTITY_KEY",
-	//	5 "SIGNATURE // Marshaled data excluding the sig (pad with 64 null bytes)",
-	//],
+	// 	"extids":[
+	// 	0 "TwitterBank Record", # Used to identify an entry for this project
+	// 	1 "TWITTER_HANDLE_ID", # To be able to find twitter user (use id not handle)
+	// 	2 "TWEET_ID", # Tweet id to locate tweet
+	// 	3 "IDENTITY_RECORDING", # Identity witnessing tweet
+	// 	4 "IDENTITY_KEY",
+	// 	5 "SIGNATURE // Marshaled data excluding the sig (pad with 64 null bytes)",
+	// ],
 	//		"content": {
 	//		"dateFetched": "DATE_API_CALL",
 	//		"tweet":{ # All data for the tweet that we want to keep
@@ -101,14 +113,14 @@ func (p *Processor) ProcessTwitterEntry(entry interfaces.IEBEntry, dblock interf
 	//	}
 	//}
 
-	handle_id_str := string(entry.ExternalIDs()[1])
+	handle_id_str := string(entry.ExternalIDs()[RecordTwitterHandleID])
 	handle_id, err := strconv.ParseInt(handle_id_str, 10, 64)
 	if err != nil {
 		// We don't really need this key.
 		flog.Warnf("Twitter_id to int failed: %s", err.Error())
 	}
 
-	tweet_id_str := string(entry.ExternalIDs()[2])
+	tweet_id_str := string(entry.ExternalIDs()[RecordTwitterTweetID])
 	tweet_id, err := strconv.ParseInt(tweet_id_str, 10, 64)
 	if err != nil {
 		// We don't really need this key.
@@ -155,7 +167,8 @@ func (p *Processor) ProcessTwitterEntry(entry interfaces.IEBEntry, dblock interf
 	}
 
 	// TODO: Verify Identity
-	identity := fmt.Sprintf("%x", entry.ExternalIDs()[3])
+	// identity := fmt.Sprintf("%x", entry.ExternalIDs()[RecordIdentityRecording])
+	identity := "placeholder"
 	// TODO: Verify Signature
 	// TODO: Verify key
 
@@ -168,8 +181,8 @@ func (p *Processor) ProcessTwitterEntry(entry interfaces.IEBEntry, dblock interf
 		TweetID:          tweet_id,
 		TweetIDStr:       tweet_id_str,
 		TweetHash:        string(tweet_content.TweetHash()),
-		Signature:        fmt.Sprintf("%x", entry.ExternalIDs()[5]),
-		SigningKey:       fmt.Sprintf("%x", entry.ExternalIDs()[4]),
+		SigningKey:       fmt.Sprintf("%x", entry.ExternalIDs()[RecordIdentityKey]),
+		Signature:        fmt.Sprintf("%x", entry.ExternalIDs()[RecordSignature]),
 		TweetRecordedAt:  dblock.GetTimestamp().GetTime(),
 		BlockHeight:      int(dblock.GetDatabaseHeight()),
 	}
