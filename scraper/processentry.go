@@ -51,7 +51,7 @@ func (p *Processor) ProcessTwitterChain(entry interfaces.IEBEntry, dblock interf
 	flog := processLog.WithFields(log.Fields{"func": "ProcessTwitterChain"})
 	// Improper start to chain
 	if len(entry.ExternalIDs()) != 3 {
-		log.Warnf("Chain %s has improper length extids to start chain", entry.GetChainID().String())
+		flog.Warnf("Chain %s has improper length extids to start chain", entry.GetChainID().String())
 		return nil
 	}
 
@@ -76,23 +76,21 @@ func (p *Processor) ProcessTwitterChain(entry interfaces.IEBEntry, dblock interf
 	return p.Database.InsertNewUserChain(&user)
 }
 
-
 const (
-	RecordEntryTitle  = iota
+	RecordEntryTitle = iota
 	RecordTwitterHandleID
 	RecordTwitterTweetID
 	// RecordIdentityRecording // TODO: Renable
 	RecordIdentityKey
 	RecordSignature
 	RecordEnd
-
 )
 
 func (p *Processor) ProcessTwitterEntry(entry interfaces.IEBEntry, dblock interfaces.IDirectoryBlock) error {
 	flog := processLog.WithFields(log.Fields{"func": "ProcessTwitterChain", "entry": entry.GetHash().String()})
 	// Improper start to chain
-	if len(entry.ExternalIDs()) != RecordEnd-1 {
-		log.Warnf("Chain %s has improper length extids to start chain", entry.GetChainID().String())
+	if len(entry.ExternalIDs()) != RecordEnd {
+		flog.Warnf("Chain %s has improper length extids to start chain", entry.GetChainID().String())
 		return nil
 	}
 
