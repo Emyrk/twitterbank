@@ -52,7 +52,7 @@ func (api *TwitterBankApiServer) Properties() *graphql.Field {
 					},
 				},
 				"factomdProperties": &graphql.Field{
-					Type: FactomdProperties,
+					Type: api.FactomdProperties(),
 					Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 						fdv, fdve, apv, apve, _, _, _, _ := factom.GetProperties()
 						return []string{fdv, fdve, apv, apve}, nil
