@@ -112,18 +112,18 @@ func (p *Processor) ProcessTwitterEntry(entry interfaces.IEBEntry, dblock interf
 	//}
 
 	handle_id_str := string(entry.ExternalIDs()[RecordTwitterHandleID])
-	handle_id, err := strconv.ParseInt(handle_id_str, 10, 64)
-	if err != nil {
-		// We don't really need this key.
-		flog.Warnf("Twitter_id to int failed: %s", err.Error())
-	}
+	// handle_id, err := strconv.ParseInt(handle_id_str, 10, 64)
+	// if err != nil {
+	// 	// We don't really need this key.
+	// 	flog.Warnf("handle_id to int failed: %s", err.Error())
+	// }
 
 	tweet_id_str := string(entry.ExternalIDs()[RecordTwitterTweetID])
-	tweet_id, err := strconv.ParseInt(tweet_id_str, 10, 64)
-	if err != nil {
-		// We don't really need this key.
-		flog.Warnf("Twitter_id to int failed: %s", err.Error())
-	}
+	// tweet_id, err := strconv.ParseInt(tweet_id_str, 10, 64)
+	// if err != nil {
+	// 	// We don't really need this key.
+	// 	flog.Warnf("tweet_id to int failed: %s", err.Error())
+	// }
 
 	//TweetAuthorID    int64  `json:"tweet_author"`
 	//TweetAuthorIDStr string `json:"tweet_author_str"`
@@ -149,13 +149,13 @@ func (p *Processor) ProcessTwitterEntry(entry interfaces.IEBEntry, dblock interf
 	// TODO: Verify handle is in right chain
 	tweet := database.TwitterTweetObject{
 		TweetAuthorIDStr: handle_id_str,
-		TweetAuthorID:    handle_id,
-		TweetIDStr:       tweet_id_str,
-		TweetID:          tweet_id,
-		ChainID:          entry.GetChainID().String(),
-		EntryHash:        entry.GetHash().String(),
-		TweetCreatedAt:   created_date,
-		RawTweet:         string(entry.GetContent()),
+		// TweetAuthorID:    handle_id,
+		TweetIDStr: tweet_id_str,
+		// TweetID:          tweet_id,
+		ChainID:        entry.GetChainID().String(),
+		EntryHash:      entry.GetHash().String(),
+		TweetCreatedAt: created_date,
+		RawTweet:       string(entry.GetContent()),
 	}
 
 	// Some verification the tweet content matches the entry's header
@@ -175,14 +175,14 @@ func (p *Processor) ProcessTwitterEntry(entry interfaces.IEBEntry, dblock interf
 		EntryHash:        entry.GetHash().String(),
 		ChainID:          entry.GetChainID().String(),
 		TweetAuthorIDStr: handle_id_str,
-		TweetAuthorID:    handle_id,
-		TweetID:          tweet_id,
-		TweetIDStr:       tweet_id_str,
-		TweetHash:        string(tweet_content.TweetHash()),
-		SigningKey:       fmt.Sprintf("%x", entry.ExternalIDs()[RecordIdentityKey]),
-		Signature:        fmt.Sprintf("%x", entry.ExternalIDs()[RecordSignature]),
-		TweetRecordedAt:  dblock.GetTimestamp().GetTime(),
-		BlockHeight:      int(dblock.GetDatabaseHeight()),
+		// TweetAuthorID:    handle_id,
+		// TweetID:          tweet_id,
+		TweetIDStr:      tweet_id_str,
+		TweetHash:       string(tweet_content.TweetHash()),
+		SigningKey:      fmt.Sprintf("%s", string(entry.ExternalIDs()[RecordIdentityKey])),
+		Signature:       fmt.Sprintf("%s", string(entry.ExternalIDs()[RecordSignature])),
+		TweetRecordedAt: dblock.GetTimestamp().GetTime(),
+		BlockHeight:     int(dblock.GetDatabaseHeight()),
 	}
 
 	err = p.Database.InsertNewTweet(&tweet, &record)
