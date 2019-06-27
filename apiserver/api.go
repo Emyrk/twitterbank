@@ -109,6 +109,18 @@ func (api *TwitterBankApiServer) TwitterUserType() *graphql.Object {
 				Type:        graphql.String,
 				Description: "User ID of a given twitter user",
 			},
+			"chain_id": &graphql.Field{
+				Type:        graphql.String,
+				Description: "Chainid tracking the user",
+			},
+			"entry_hash": &graphql.Field{
+				Type:        graphql.String,
+				Description: "First entry for a user chain",
+			},
+			"BlockInitiated": &graphql.Field{
+				Type:        graphql.Int,
+				Description: "What block the user tracking started in",
+			},
 		}})
 }
 
