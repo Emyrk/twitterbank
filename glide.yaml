@@ -11,3 +11,4 @@ import:
   - common/interfaces
   - common/primitives
 - package: github.com/sirupsen/logrus
+- package: github.com/dghubble/go-twitter

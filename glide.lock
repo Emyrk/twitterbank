@@ -159,4 +159,6 @@ imports:
   - types
 - name: gopkg.in/warnings.v0
   version: ec4a0fea49c7b46c2aeb0b51aac55779c607e52b
+- name: github.com/dghubble/go-twitter
+  version: 53f972dc4b060ca0107e36a9b118d88c97d816e5
 testImports: []
