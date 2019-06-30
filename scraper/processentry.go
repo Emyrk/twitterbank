@@ -156,6 +156,7 @@ func (p *Processor) ProcessTwitterEntry(entry interfaces.IEBEntry, dblock interf
 		EntryHash:        entry.GetHash().String(),
 		TweetCreatedAt:   created_date,
 		RawTweet:         string(entry.GetContent()),
+		Proofs:           []database.TwitterTweetRecord{},
 	}
 
 	// Some verification the tweet content matches the entry's header
@@ -186,6 +187,9 @@ func (p *Processor) ProcessTwitterEntry(entry interfaces.IEBEntry, dblock interf
 	}
 
 	err = p.Database.InsertNewTweet(&tweet, &record)
+	if err != nil {
+		return err
+	}
 	if tweet.Collaborate(tweet_content) {
 		return err
 	}

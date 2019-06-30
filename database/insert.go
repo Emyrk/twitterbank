@@ -1,5 +1,9 @@
 package database
 
+import (
+	"fmt"
+)
+
 func (db *TwitterBankDatabase) InsertCompletedHeight(height int) error {
 	if dbc := db.DB.Create(&CompletedHeight{BlockHeight: height}); dbc.Error != nil {
 		// Create failed, do something e.g. return, panic etc.
@@ -23,7 +27,7 @@ func (db *TwitterBankDatabase) InsertNewTweet(tweet *TwitterTweetObject, record 
 		SELECT exists(SELECT * FROM twitter_tweet_objects WHERE tweet_hash = '$1' AND tweet_id_str = '$2')
 	`, tweet.TweetHash, tweet.TweetIDStr).Scan(exists)
 	if d.Error != nil {
-		return d.Error
+		return fmt.Errorf("exits_query: %s", d.Error.Error())
 	}
 
 	tx := db.DB.Begin()
@@ -31,17 +35,17 @@ func (db *TwitterBankDatabase) InsertNewTweet(tweet *TwitterTweetObject, record 
 		// Insert Tweet first
 		if dbc := db.DB.Create(tweet); dbc.Error != nil {
 			tx.Rollback()
-			return dbc.Error
+			return fmt.Errorf("tweet_create: %s", dbc.Error.Error())
 		}
 	}
 	if dbc := db.DB.Create(record); dbc.Error != nil {
 		tx.Rollback()
-		return dbc.Error
+		return fmt.Errorf("record_create: %s", dbc.Error)
 	}
 
 	if dbc := tx.Commit(); dbc.Error != nil {
 		tx.Rollback()
-		return dbc.Error
+		return fmt.Errorf("tx_commit: %s", dbc.Error)
 	}
 	return nil
 }
