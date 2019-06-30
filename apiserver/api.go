@@ -172,7 +172,7 @@ func (api *TwitterBankApiServer) TwitterTweetType() *graphql.Object {
 				Description: "Time the tweet was tweeted on the twitter platform.",
 			},
 			"raw_tweet": &graphql.Field{
-				Type:        JSON,
+				Type:        graphql.String,
 				Description: "This field has not been dissected yet",
 			},
 			"proofs": &graphql.Field{
