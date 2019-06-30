@@ -178,7 +178,7 @@ func (api *TwitterBankApiServer) TwitterTweetType() *graphql.Object {
 				Description: "This field has not been dissected yet",
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					tu, ok := p.Source.(*database.TwitterTweetObject)
-					if !ok {
+					if ok {
 						tweet, err := database.NewFactomTweetFromContent([]byte(tu.RawTweet))
 						if err != nil {
 							return nil, err
