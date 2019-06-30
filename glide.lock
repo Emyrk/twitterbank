@@ -1,5 +1,5 @@
-hash: 7ec0b5ae5d0434c47908dba29d1accf0837d6bb190b509766ec4f63bc2c48bc4
-updated: 2019-04-02T14:26:42.39156378-04:00
+hash: ed8c78f98dc08ab1e202f1aee9cabab0d52645b1a421c4a60d0eb54722140459
+updated: 2019-06-30T09:21:50.336634509-05:00
 imports:
 - name: github.com/beorn7/perks
   version: 3a771d992973f24aa725d07868b467d1ddfceafb
@@ -9,6 +9,14 @@ imports:
   version: f2b1058a82554c0c7c3b8809c5956c38374604d8
   subpackages:
   - base58
+- name: github.com/cenkalti/backoff
+  version: 4b4cebaf850ec58f1bb1fec5bdebdf8501c2bc3f
+- name: github.com/dghubble/go-twitter
+  version: 53f972dc4b060ca0107e36a9b118d88c97d816e5
+  subpackages:
+  - twitter
+- name: github.com/dghubble/sling
+  version: 22538d0bac4e8b6337114fccfdfeb6d1ad0ef2d2
 - name: github.com/Emyrk/factom-identity
   version: f3e9d819e1973b2ee21e6152378a5fdf9b7065fc
 - name: github.com/Emyrk/factom-raw
@@ -86,6 +94,10 @@ imports:
   version: ddf22928ea3c56eb4292a0adbbf5001b1e8e7d0d
   subpackages:
   - proto
+- name: github.com/google/go-querystring
+  version: c8c88dbee036db4e4808d1f2ec8c2e15e11c3f80
+  subpackages:
+  - query
 - name: github.com/graphql-go/graphql
   version: a7e15c0298411af18c694ca387e733acef287104
   subpackages:
@@ -159,6 +171,4 @@ imports:
   - types
 - name: gopkg.in/warnings.v0
   version: ec4a0fea49c7b46c2aeb0b51aac55779c607e52b
-- name: github.com/dghubble/go-twitter
-  version: 53f972dc4b060ca0107e36a9b118d88c97d816e5
 testImports: []
