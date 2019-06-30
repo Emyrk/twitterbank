@@ -6,6 +6,8 @@ import (
 	"github.com/graphql-go/graphql/language/ast"
 	"github.com/graphql-go/graphql/language/kinds"
 
+	"reflect"
+
 	"github.com/Emyrk/twitterbank/database"
 	"github.com/graphql-go/graphql"
 )
@@ -183,7 +185,7 @@ func (api *TwitterBankApiServer) TwitterTweetType() *graphql.Object {
 						}
 						return tweet, nil
 					}
-					return nil, fmt.Errorf("Error unmarshaling type")
+					return nil, fmt.Errorf("Error unmarshaling type, found %v", reflect.TypeOf(p.Source))
 				},
 			},
 			"proofs": &graphql.Field{
