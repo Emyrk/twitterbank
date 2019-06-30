@@ -160,7 +160,7 @@ func (p *Processor) ProcessTwitterEntry(entry interfaces.IEBEntry, dblock interf
 
 	// Some verification the tweet content matches the entry's header
 	if tweet.Collaborate(tweet_content) {
-		flog.Warnf("Content does not collaborate extids", err.Error())
+		flog.Warnf("Content does not collaborate extids Uid: %s/%s, Tid: %s/%s", tweet.TweetAuthorIDStr, handle_id_str, tweet.TweetIDStr, tweet_id_str)
 		return nil
 	}
 
