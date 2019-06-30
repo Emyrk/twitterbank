@@ -172,8 +172,19 @@ func (api *TwitterBankApiServer) TwitterTweetType() *graphql.Object {
 				Description: "Time the tweet was tweeted on the twitter platform.",
 			},
 			"raw_tweet": &graphql.Field{
-				Type:        graphql.String,
+				Type:        JSON,
 				Description: "This field has not been dissected yet",
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					tu, ok := p.Source.(*database.TwitterTweetObject)
+					if !ok {
+						tweet, err := database.NewFactomTweetFromContent([]byte(tu.RawTweet))
+						if err != nil {
+							return nil, err
+						}
+						return tweet, nil
+					}
+					return nil, fmt.Errorf("Error unmarshaling type")
+				},
 			},
 			"proofs": &graphql.Field{
 				Type:        graphql.NewList(TwitterTweetProofType),
