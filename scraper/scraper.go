@@ -152,7 +152,7 @@ MainCatchupLoop:
 
 				entry, err := s.Factom.FetchEntry(ehash)
 				if err != nil {
-					errorAndWait(flog.WithField("fetch", "entry").WithField("entry", entry.GetHash().String()), err)
+					errorAndWait(flog.WithField("fetch", "entry").WithField("entry", ehash.String()), err)
 					continue MainCatchupLoop
 				}
 

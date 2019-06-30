@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"time"
 
+	"fmt"
+
 	"github.com/dghubble/go-twitter/twitter"
 )
 
@@ -91,6 +93,10 @@ func NewFactomTweetFromContent(content []byte) (*FactomTweetContent, error) {
 	// tc := new(twitter.Tweet)
 	err := json.Unmarshal(content, tc)
 	return tc, err
+}
+
+func (t *FactomTweetContent) TweetHashString() string {
+	return fmt.Sprintf("%x", t.TweetHash())
 }
 
 func (t *FactomTweetContent) TweetHash() []byte {

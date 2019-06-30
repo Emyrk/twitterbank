@@ -156,7 +156,8 @@ func (p *Processor) ProcessTwitterEntry(entry interfaces.IEBEntry, dblock interf
 		EntryHash:        entry.GetHash().String(),
 		TweetCreatedAt:   created_date,
 		RawTweet:         string(entry.GetContent()),
-		Proofs:           []database.TwitterTweetRecord{},
+		TweetHash:        "test", // tweet_content.TweetHashString(),
+		// Proofs:           []database.TwitterTweetRecord{},
 	}
 
 	// Some verification the tweet content matches the entry's header
@@ -179,9 +180,9 @@ func (p *Processor) ProcessTwitterEntry(entry interfaces.IEBEntry, dblock interf
 		TweetAuthorID:    handle_id,
 		TweetID:          tweet_id,
 		TweetIDStr:       tweet_id_str,
-		TweetHash:        string(tweet_content.TweetHash()),
-		SigningKey:       fmt.Sprintf("%s", string(entry.ExternalIDs()[RecordIdentityKey])),
-		Signature:        fmt.Sprintf("%s", string(entry.ExternalIDs()[RecordSignature])),
+		TweetHash:        tweet_content.TweetHashString(),
+		SigningKey:       fmt.Sprintf("%x", entry.ExternalIDs()[RecordIdentityKey]),
+		Signature:        fmt.Sprintf("%x", entry.ExternalIDs()[RecordSignature]),
 		TweetRecordedAt:  dblock.GetTimestamp().GetTime(),
 		BlockHeight:      int(dblock.GetDatabaseHeight()),
 	}

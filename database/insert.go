@@ -22,16 +22,18 @@ func (db *TwitterBankDatabase) InsertNewUserChain(user *TwitterUser) error {
 
 func (db *TwitterBankDatabase) InsertNewTweet(tweet *TwitterTweetObject, record *TwitterTweetRecord) error {
 	// First check if the tweet exists. If it does, we only need to add another record of it's existence
-	var count int
+	var exists Exists
 	d := db.DB.Raw(`
-		SELECT * FROM twitter_tweet_objects WHERE tweet_hash = ? AND tweet_id_str = ?
-	`, tweet.TweetHash, tweet.TweetIDStr).Count(&count)
+		SELECT EXISTS(SELECT * FROM twitter_tweet_objects WHERE tweet_hash = ? AND tweet_id_str = ?)
+	`, tweet.TweetHash, tweet.TweetIDStr).First(&exists)
 	if d.Error != nil {
 		return fmt.Errorf("exists_query: %s", d.Error.Error())
 	}
 
+	fmt.Printf("%v", tweet)
+
 	tx := db.DB.Begin()
-	if count == 0 {
+	if !exists.Exists {
 		// Insert Tweet first
 		if dbc := db.DB.Create(tweet); dbc.Error != nil {
 			tx.Rollback()
