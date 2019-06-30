@@ -115,25 +115,25 @@ MainCatchupLoop:
 		dblock, err := s.Factom.FetchDBlockByHeight(next)
 		if err != nil {
 			errorAndWait(flog.WithField("fetch", "dblock"), err)
-			continue
+			continue MainCatchupLoop
 		}
 
 		fblock, err := s.Factom.FetchFBlockByHeight(next)
 		if err != nil {
 			errorAndWait(flog.WithField("fetch", "fblock"), err)
-			continue
+			continue MainCatchupLoop
 		}
 		ablock, err := s.Factom.FetchABlockByHeight(next)
 		if err != nil {
 			errorAndWait(flog.WithField("fetch", "ablock"), err)
-			continue
+			continue MainCatchupLoop
 		}
 
 		ec_keymr := dblock.GetDBEntries()[1]
 		ecblock, err := s.Factom.FetchECBlock(ec_keymr.GetKeyMR())
 		if err != nil {
 			errorAndWait(flog.WithField("fetch", "ecblock"), err)
-			continue
+			continue MainCatchupLoop
 		}
 
 		var _, _, _ = fblock, ablock, ecblock
@@ -142,7 +142,7 @@ MainCatchupLoop:
 			eblock, err := s.Factom.FetchEBlock(eblockEntry.GetKeyMR())
 			if err != nil {
 				errorAndWait(flog.WithField("fetch", "eblock"), err)
-				continue
+				continue MainCatchupLoop
 			}
 
 			for _, ehash := range eblock.GetEntryHashes() {
@@ -153,13 +153,13 @@ MainCatchupLoop:
 				entry, err := s.Factom.FetchEntry(ehash)
 				if err != nil {
 					errorAndWait(flog.WithField("fetch", "entry").WithField("entry", entry.GetHash().String()), err)
-					continue
+					continue MainCatchupLoop
 				}
 
 				err = s.processor.ProcessEntry(entry, dblock)
 				if err != nil {
 					errorAndWait(flog.WithField("process", "entry").WithField("entry", entry.GetHash().String()), err)
-					continue
+					continue MainCatchupLoop
 				}
 			}
 		}
