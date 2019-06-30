@@ -24,7 +24,7 @@ func (db *TwitterBankDatabase) InsertNewTweet(tweet *TwitterTweetObject, record 
 	// First check if the tweet exists. If it does, we only need to add another record of it's existence
 	var count int
 	d := db.DB.Raw(`
-		SELECT * FROM twitter_tweet_objects WHERE tweet_hash = '?' AND tweet_id_str = '?'
+		SELECT * FROM twitter_tweet_objects WHERE tweet_hash = ? AND tweet_id_str = ?
 	`, tweet.TweetHash, tweet.TweetIDStr).Count(&count)
 	if d.Error != nil {
 		return fmt.Errorf("exists_query: %s", d.Error.Error())
