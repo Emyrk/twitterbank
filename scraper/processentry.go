@@ -11,7 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var TestingString = "testing_kafka24"
+var TestingString = "testing_kafka28"
 
 var processLog = log.WithFields(log.Fields{"file": "processentry"})
 
@@ -34,13 +34,13 @@ func (s *Processor) ProcessEntry(entry interfaces.IEBEntry, dblock interfaces.ID
 		return nil
 	}
 	switch string(entry.ExternalIDs()[0]) {
-	case "TwitterBank Record":
+	case "TwitterBank Chain":
 		// TODO: Remove this hack
 		if len(entry.ExternalIDs()) == 3 {
 			return s.ProcessTwitterChain(entry, dblock)
 		}
 		return s.ProcessTwitterEntry(entry, dblock)
-	case "TwitterBank Chain":
+	case "TwitterBank Record":
 		return s.ProcessTwitterChain(entry, dblock)
 	}
 
