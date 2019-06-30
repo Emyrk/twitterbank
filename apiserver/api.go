@@ -6,8 +6,6 @@ import (
 	"github.com/graphql-go/graphql/language/ast"
 	"github.com/graphql-go/graphql/language/kinds"
 
-	"reflect"
-
 	"github.com/Emyrk/twitterbank/database"
 	"github.com/graphql-go/graphql"
 )
@@ -23,6 +21,8 @@ type GraphQLAPITypes struct {
 	TwitterUserSingletonNoTweets *graphql.Object
 	TwitterUserSingleton         *graphql.Object
 }
+
+var TweetJSON = TweetJSONScalar()
 
 func (api *TwitterBankApiServer) init() {
 	api.apiTypes = new(GraphQLAPITypes)
@@ -174,19 +174,8 @@ func (api *TwitterBankApiServer) TwitterTweetType() *graphql.Object {
 				Description: "Time the tweet was tweeted on the twitter platform.",
 			},
 			"raw_tweet": &graphql.Field{
-				Type:        JSON,
+				Type:        TweetJSON,
 				Description: "This field has not been dissected yet",
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					tu, ok := p.Source.(*database.TwitterTweetObject)
-					if ok {
-						tweet, err := database.NewFactomTweetFromContent([]byte(tu.RawTweet))
-						if err != nil {
-							return nil, err
-						}
-						return tweet, nil
-					}
-					return nil, fmt.Errorf("Error unmarshaling type, found %v", reflect.TypeOf(p.Source))
-				},
 			},
 			"proofs": &graphql.Field{
 				Type:        graphql.NewList(TwitterTweetProofType),
@@ -294,17 +283,43 @@ func parseLiteral(astValue ast.Value) interface{} {
 	}
 }
 
-// JSON json type
-var JSON = graphql.NewScalar(
-	graphql.ScalarConfig{
-		Name:        "JSON",
-		Description: "The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf)",
-		Serialize: func(value interface{}) interface{} {
-			return value
+// // JSON json type
+// var JSON = graphql.NewScalar(
+// 	graphql.ScalarConfig{
+// 		Name:        "JSON",
+// 		Description: "The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf)",
+// 		Serialize: func(value interface{}) interface{} {
+// 			return value
+// 		},
+// 		ParseValue: func(value interface{}) interface{} {
+// 			return value
+// 		},
+// 		ParseLiteral: parseLiteral,
+// 	},
+// )
+
+func TweetJSONScalar() *graphql.Scalar {
+	return graphql.NewScalar(
+		graphql.ScalarConfig{
+			Name:        fmt.Sprintf("TweetJSON"),
+			Description: "The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf)",
+			Serialize: func(value interface{}) interface{} {
+				s, ok := value.(string)
+				if !ok {
+					panic("sss")
+					return nil
+				}
+				tu, err := database.NewFactomTweetFromContent([]byte(s))
+				if err != nil {
+					panic(err.Error())
+					return nil
+				}
+				return tu
+			},
+			ParseValue: func(value interface{}) interface{} {
+				return value
+			},
+			ParseLiteral: parseLiteral,
 		},
-		ParseValue: func(value interface{}) interface{} {
-			return value
-		},
-		ParseLiteral: parseLiteral,
-	},
-)
+	)
+}
