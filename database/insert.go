@@ -25,9 +25,9 @@ func (db *TwitterBankDatabase) InsertNewTweet(tweet *TwitterTweetObject, record 
 	var exists bool
 	d := db.DB.Raw(`
 		SELECT exists(SELECT * FROM twitter_tweet_objects WHERE tweet_hash = '$1' AND tweet_id_str = '$2')
-	`, tweet.TweetHash, tweet.TweetIDStr).Scan(exists)
+	`, tweet.TweetHash, tweet.TweetIDStr).First(&exists)
 	if d.Error != nil {
-		return fmt.Errorf("exits_query: %s", d.Error.Error())
+		return fmt.Errorf("exists_query: %s", d.Error.Error())
 	}
 
 	tx := db.DB.Begin()
